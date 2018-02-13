@@ -118,11 +118,14 @@ class My_Flight extends Transaction{
 			if(_p.lmode==-1 || _p.lmode==0){
 				_p.scount++;
 				_p.lmode=0;
-				for(int i=0;i<_p.fl.size();i++){
-					System.out.print(_p.fl.get(i)+" ");
+				System.out.println("The flights for passenger "+id+" are:");
+				for(int j=0;j<_p.fl.size();j++){
+					System.out.print(_p.fl.get(j)+" ");
 				}
-				//String fl="";
-				
+				_p.scount--;
+				if(_p.scount==0){
+					_p.lmode=-1;
+				}
 			}
 		}
 		else{
@@ -142,8 +145,6 @@ class Cancel extends Transaction
 		f = _f;
 		p = _p;
 	}
-	private Object lock = new Object();
-	@Override
 	public void run() 
 	{
 		flight _f = db.fl[f];
@@ -199,8 +200,6 @@ class Transfer extends Transaction
 		f2 = _f2;
 		p = _p;
 	}
-	private Object lock = new Object();
-	@Override
 	public void run() {
 		flight _f1 = db.fl[f1];
 		flight _f2 = db.fl[f2];
