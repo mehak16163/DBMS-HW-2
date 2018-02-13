@@ -392,9 +392,8 @@ public class flight_info_db {//database class
 			}
 		}long startTime; 
     	long endTime; 
-		
+   		startTime = System.currentTimeMillis();
 		if (mode){
-	   		startTime = System.currentTimeMillis();
 			ExecutorService exec = Executors.newFixedThreadPool(5);//creating threadpool for concurrency.
 			for (int i=0;i<t;i++){
 				exec.execute(tran[i]);
@@ -403,15 +402,18 @@ public class flight_info_db {//database class
 				exec.shutdown();
 				exec.awaitTermination(10,TimeUnit.SECONDS);
 			}
+			
 		}
 		else{
-	   		startTime = System.currentTimeMillis();
 			for(int i=0;i<t;i++){
 				tran[i].run();
 			}
+			
 		}	
-        	endTime = System.currentTimeMillis();
-        	double final_time = (endTime - startTime)/1000.0;
-        	System.out.println("Time Elapsed is: " + final_time);
+		endTime = System.currentTimeMillis();
+    	double final_time = (endTime - startTime)/1000.0;
+		Thread.sleep(5000);
+    	System.out.println("Time Elapsed is: " + final_time);
+        	
 	}
 }
