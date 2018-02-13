@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 class flight{//flight class
@@ -148,7 +149,6 @@ class Total_Reservations extends Transaction
 		super(db, m);
 	}
 
-	@Override
 	public void run() 
 	{
 		int sum = 0;
@@ -307,7 +307,7 @@ public class flight_info_db {//database class
 	static flight[] fl;//list of flights
 	static int scount=0;
 	static int lmode =-1; //-1 for no lock , 0 for shared, 1 for exclusive. 
-	public static void main(String[] args) throws NumberFormatException, IOException{
+	public static void main(String[] args) throws NumberFormatException, IOException, InterruptedException{
 		BufferedReader rd = new BufferedReader(new InputStreamReader(System.in));
 		System.out.println("Enter no. of flights: ");
 		int  flights = Integer.parseInt(rd.readLine());
@@ -349,10 +349,30 @@ public class flight_info_db {//database class
 				int p = rint.nextInt(passengers)+1;
 				tran[i] = new My_Flight(db , p , mode);
 			}
+			else if (tid==4){
+				tran[i] = new Total_Reservations(db , mode);
+			}
+			else{
+				int f = rint.nextInt(flights)+1;
+				int p = rint.nextInt(passengers)+1;
+				int f2 = rint.nextInt(flights)+1;
+				tran[i] = new Transfer(db , f, f2 , p ,mode);
+			}
 		}
-		ExecutorService exec = Executors.newFixedThreadPool(5);//creating threadpool for concurrency.
-		for (int i=0;i<t;i++){
-			
+		if (mode){
+			ExecutorService exec = Executors.newFixedThreadPool(5);//creating threadpool for concurrency.
+			for (int i=0;i<t;i++){
+				exec.execute(tran[i]);
+			}
+			if(!exec.isTerminated()){
+				exec.shutdown();
+				exec.awaitTermination(10,TimeUnit.SECONDS);
+			}
+		}
+		else{
+			for(int i=0;i<t;i++){
+				tran[i].run();
+			}
 		}
 	}
 }
