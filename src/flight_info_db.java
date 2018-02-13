@@ -129,7 +129,10 @@ class My_Flight extends Transaction{
 			}
 		}
 		else{
-			
+			System.out.println("The flights for passenger "+id+" are:");
+			for(int j=0;j<_p.fl.size();j++){
+				System.out.print(_p.fl.get(j)+" ");
+			}
 		}
 	}
 	
@@ -170,6 +173,7 @@ class Cancel extends Transaction
 				_f.pass.remove(_p);
 				_p.lock.unlock();
 				_f.lock.unlock();
+				System.out.println("Flight "+f+"cancelled for passenger "+p+".");
 				_p.lmode = -1;
 				_f.lmode = -1;
 			}
@@ -177,6 +181,7 @@ class Cancel extends Transaction
 			{
 				_p.fl.remove(_f);
 				_f.pass.remove(_p);
+				System.out.println("Flight "+f+"cancelled for passenger "+p+".");
 			}
 		}
 		else
