@@ -7,8 +7,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 
 class flight{//flight class
+	int lmode =-1; //-1 means no lock , 0 means shared lock , 1 means exclusive lock 
 	int id ;
-	ReentrantLock lock = new ReentrantLock();
+	int scount=0;
+	ReentrantLock lock = new ReentrantLock();//for exclusive locks
 	static int count=1;
 	ArrayList<passenger> pass = new ArrayList<passenger>();//passengers of that flight
 	public flight(){
@@ -18,7 +20,9 @@ class flight{//flight class
 }
 
 class passenger{//passenger class
+	int lmode = -1; //-1 means no lock, 0 means shared lock , 1 means exclusive lock 
 	ReentrantLock lock = new ReentrantLock();
+	int scount =0;
 	int id;
 	static int count=1;
 	ArrayList<flight> fl = new ArrayList<flight>();//flights of that passenger 
@@ -45,17 +49,26 @@ class Reserve extends Transaction{//Transaction of type reserve
 		f = _f;
 		p = _p;
 	}
-	private Object lock = new Object();//for implementing 2PL
 	public void run() {
 		flight _f = db.fl[f];
 		passenger _p = db.pass[p];
 		if (mode){
+			int i=0;
+			while(_p.lmode!=-1 && _f.lmode!= -1 && i<=10000)//checking for shared locks if acquired.
+				i++;
+			if (i==10001){
+				System.out.println("Deadlock on Reserve("+f+","+p+")");
+				return;
+			}
 			_p.lock.lock();
-			_p.fl.add(_f);
 			_f.lock.lock();
+			_p.lmode = 1;
+			_f.lmode = 1;
+			_p.fl.add(_f);
 			_f.pass.add(_p);
 			_p.lock.unlock();
 			_f.lock.unlock();
+			_p.lmode=-1; _f.lmode=-1;
 			//releasing the locks
 		}
 		else{
@@ -71,7 +84,8 @@ class Reserve extends Transaction{//Transaction of type reserve
 public class flight_info_db {//database class
 	static passenger[] pass;//list of passengers
 	static flight[] fl;//list of flights
-		
+	static int scount=0;
+	static int lmode =-1; //-1 for no lock , 0 for shared, 1 for exclusive. 
 	public static void main(String[] args) throws NumberFormatException, IOException{
 		BufferedReader rd = new BufferedReader(new InputStreamReader(System.in));
 		System.out.println("Enter no. of flights: ");
