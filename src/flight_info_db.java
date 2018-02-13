@@ -62,7 +62,7 @@ class Reserve extends Transaction{//Transaction of type reserve
 		flight _f = db.fl[f];
 		passenger _p = db.pass[p];
 		if (_f.pass.contains(_p)){
-			System.out.println("Passenger "+p+" is already in flight "+f+".");
+			System.out.println("Passenger "+p+" has already reserved a seat in flight "+f+".");
 			return;
 		}
 		if (mode){
@@ -76,14 +76,14 @@ class Reserve extends Transaction{//Transaction of type reserve
 			_p.lock.lock();
 			_f.lock.lock();
 			if (_f.pass.size()<_f.capacity){
-				System.out.println("Passenger "+p+" added to flight "+ f+".");
+				System.out.println("Seat reserved for Passenger "+p+" on flight "+ f+".");
 				_p.lmode = 1;
 				_f.lmode = 1;
 				_p.fl.add(_f);
 				_f.pass.add(_p);
 			}
 			else{
-				System.out.println("Capacity of flight "+f+" is full. Passenger "+p+" could not be added.");
+				System.out.println("Capacity of flight "+f+" is full. Seat for passenger "+p+" could not be reserved.");
 			}
 			_p.lock.unlock();
 			_f.lock.unlock();
@@ -94,10 +94,10 @@ class Reserve extends Transaction{//Transaction of type reserve
 			if (_f.pass.size()<_f.capacity){
 				_p.fl.add(_f);
 				_f.pass.add(_p);
-				System.out.println("Passenger "+p+" added to flight "+ f+".");
+				System.out.println("Seat reserved for Passenger "+p+" on flight "+ f+".");
 			}
 			else{
-				System.out.println("Capacity of flight "+f+" is full. Passenger "+p+" could not be added.");
+				System.out.println("Capacity of flight "+f+" is full. Seat for passenger "+p+" could not be reserved.");
 			}
 		}
 	}
@@ -132,7 +132,7 @@ class My_Flight extends Transaction{
 				_p.lmode=0;
 				System.out.println("The flights for passenger "+id+" are:");
 				for(int j=0;j<_p.fl.size();j++){
-					System.out.print(_p.fl.get(j)+" ");
+					System.out.print(_p.fl.get(j).id+" ");
 				}
 				System.out.println();
 				_p.scount--;
@@ -144,7 +144,7 @@ class My_Flight extends Transaction{
 		else{
 			System.out.println("The flights for passenger "+id+" are:");
 			for(int j=0;j<_p.fl.size();j++){
-				System.out.print(_p.fl.get(j)+" ");
+				System.out.print(_p.fl.get(j).id+" ");
 			}
 			System.out.println();
 		}
@@ -169,13 +169,13 @@ class Total_Reservations extends Transaction
 		int sum = 0;
 		if(mode)
 		{
-			for(int i = 0 ; i<db.fl.length ; i++)
+			for(int i = 1 ; i<db.fl.length ; i++)
 			{
 				flight f = db.fl[i];
 				int j = 0;
 				while(f.lmode == 1 && j<10000)
 				{
-					i++;
+					j++;
 				}
 				if(j == 10000)
 				{
@@ -194,8 +194,14 @@ class Total_Reservations extends Transaction
 					}
 				}
 			}
+			System.out.println("Total Reservations made on all flights are: " + sum);
 		}
-		System.out.println("Total Reservations made on all filghts are: " + sum);
+		else{
+			for (int i=1;i<db.fl.length;i++){
+				sum = sum + db.fl[i].pass.size();
+			}
+			System.out.println("Total Reservations made on all flights are: " + sum);
+		}
 	}
 }
 
@@ -252,7 +258,7 @@ class Cancel extends Transaction
 		}
 		else
 		{
-			System.out.println("Passenger " + p + "did not reserve Flight " + f);
+			System.out.println("Cancellation not done since, passenger " + p + " did not reserve Flight " + f);
 		}
 	}
 }
@@ -319,10 +325,10 @@ class Transfer extends Transaction
 			}
 		}
 		else if (!_f1.pass.contains(_p)){
-			System.out.println("No passenger "+p+" on flight "+f1+".");
+			System.out.println("No transfer since, No passenger "+p+" on flight "+f1+".");
 		}
 		else{
-			System.out.println("No capacity in flight "+f2+".");
+			System.out.println("No transfer since, No capacity in flight "+f2+".");
 		}
 	}
 }
