@@ -168,7 +168,6 @@ class Cancel extends Transaction
 				_f.lmode = 1;
 				_p.fl.remove(_f);
 				_f.pass.remove(_p);
-				_f.capacity = _f.capacity + 1;
 				_p.lock.unlock();
 				_f.lock.unlock();
 				_p.lmode = -1;
@@ -178,12 +177,11 @@ class Cancel extends Transaction
 			{
 				_p.fl.remove(_f);
 				_f.pass.remove(_p);
-				_f.capacity = _f.capacity + 1;
 			}
 		}
 		else
 		{
-			System.out.println("Passenger " + _p + "did not reserve Flight " + _f);
+			System.out.println("Passenger " + p + "did not reserve Flight " + f);
 		}
 	}
 }
@@ -204,7 +202,7 @@ class Transfer extends Transaction
 		flight _f1 = db.fl[f1];
 		flight _f2 = db.fl[f2];
 		passenger _p = db.pass[p];
-		if(_f1.pass.contains(p) == true && _f2.capacity != 0)
+		if(_f1.pass.contains(p) == true && _f2.capacity > _f2.pass.size())
 		{
 			if(mode)
 			{
@@ -214,7 +212,7 @@ class Transfer extends Transaction
 					i = i + 1;
 				}
 				if (i == 10001){
-					System.out.println("Deadlock on Transfer("+_f1+","+_f2+","+p+")");
+					System.out.println("Deadlock on Transfer("+f1+","+f2+","+p+")");
 					return;
 				}
 				_p.lock.lock();
@@ -226,25 +224,29 @@ class Transfer extends Transaction
 				_p.fl.remove(_f1);
 				_p.fl.add(_f2);
 				_f1.pass.remove(_p);
-				_f1.capacity = _f1.capacity + 1;
 				_f2.pass.add(_p);
-				_f2.capacity = _f2.capacity - 1;
 				_p.lock.unlock();
 				_f1.lock.unlock();
 				_f2.lock.unlock();
 				_p.lmode = -1;
 				_f1.lmode = -1;
 				_f2.lmode = -1;
+				System.out.println("Passenger "+p + " transfered from flight "+f1+" to flight "+f2+".");
 			}
 			else
 			{
 				_p.fl.remove(_f1);
 				_p.fl.add(_f2);
 				_f1.pass.remove(_p);
-				_f1.capacity = _f1.capacity + 1;
 				_f2.pass.add(_p);
-				_f2.capacity = _f2.capacity - 1;
+				System.out.println("Passenger "+p + " transfered from flight "+f1+" to flight "+f2+".");
 			}
+		}
+		else if (!_f1.pass.contains(_p)){
+			System.out.println("No passenger "+p+" on flight "+f1+".");
+		}
+		else{
+			System.out.println("No capacity in flight "+f2+".");
 		}
 	}
 }
