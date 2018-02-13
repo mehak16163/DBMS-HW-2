@@ -363,6 +363,9 @@ public class flight_info_db {//database class
 		System.out.println("Enter no. of transactions: ");
 		int t = Integer.parseInt(rd.readLine());
 		Transaction[] tran = new Transaction[t];
+		long startTime; 
+        	long endTime; 
+       		startTime = System.currentTimeMillis();
 		for(int i=0;i<t;i++){
 			Random rint = new Random();
 			int tid = rint.nextInt(5)+1;
@@ -404,6 +407,9 @@ public class flight_info_db {//database class
 			for(int i=0;i<t;i++){
 				tran[i].run();
 			}
-		}
+		}	
+        	endTime = System.currentTimeMillis();
+        	double final_time = (endTime - startTime)/1000.0;
+        	System.out.println("Time Elapsed is: " + final_time);
 	}
 }
