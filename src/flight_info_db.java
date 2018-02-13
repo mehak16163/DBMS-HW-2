@@ -54,6 +54,11 @@ class Reserve extends Transaction{//Transaction of type reserve
 		p = _p;
 	}
 	public void run() {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			
+		}
 		flight _f = db.fl[f];
 		passenger _p = db.pass[p];
 		if (_f.pass.contains(_p)){
@@ -107,6 +112,11 @@ class My_Flight extends Transaction{
 	}
 	
 	public void run() {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			
+		}
 		passenger _p = db.pass[id];// TODO Auto-generated method stub
 		if(mode){
 			int i=0;
@@ -151,6 +161,11 @@ class Total_Reservations extends Transaction
 
 	public void run() 
 	{
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			
+		}
 		int sum = 0;
 		if(mode)
 		{
@@ -196,6 +211,11 @@ class Cancel extends Transaction
 	}
 	public void run() 
 	{
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			
+		}
 		flight _f = db.fl[f];
 		passenger _p = db.pass[p];
 		if(_f.pass.contains(_p) == true) // check if passenger had reserved that flight or not
@@ -250,6 +270,11 @@ class Transfer extends Transaction
 		p = _p;
 	}
 	public void run() {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			
+		}
 		flight _f1 = db.fl[f1];
 		flight _f2 = db.fl[f2];
 		passenger _p = db.pass[p];
