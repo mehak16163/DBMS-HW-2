@@ -245,7 +245,7 @@ class Cancel extends Transaction
 				_f.pass.remove(_p);
 				_p.lock.unlock();
 				_f.lock.unlock();
-				System.out.println("Flight "+f+"cancelled for passenger "+p+".");
+				System.out.println("Flight "+f+" cancelled for passenger "+p+".");
 				_p.lmode = -1;
 				_f.lmode = -1;
 			}
@@ -253,7 +253,7 @@ class Cancel extends Transaction
 			{
 				_p.fl.remove(_f);
 				_f.pass.remove(_p);
-				System.out.println("Flight "+f+"cancelled for passenger "+p+".");
+				System.out.println("Flight "+f+" cancelled for passenger "+p+".");
 			}
 		}
 		else
@@ -325,7 +325,7 @@ class Transfer extends Transaction
 			}
 		}
 		else if (!_f1.pass.contains(_p)){
-			System.out.println("No transfer since, No passenger "+p+" on flight "+f1+".");
+			System.out.println("No transfer since, No passenger "+p+" is not on flight "+f1+".");
 		}
 		else{
 			System.out.println("No transfer since, No capacity in flight "+f2+".");
@@ -394,13 +394,13 @@ public class flight_info_db {//database class
     	long endTime; 
    		startTime = System.currentTimeMillis();
 		if (mode){
-			ExecutorService exec = Executors.newFixedThreadPool(5);//creating threadpool for concurrency.
+			ExecutorService exec = Executors.newFixedThreadPool(3);//creating threadpool for concurrency.
 			for (int i=0;i<t;i++){
 				exec.execute(tran[i]);
 			}
 			if(!exec.isTerminated()){
 				exec.shutdown();
-				exec.awaitTermination(10,TimeUnit.SECONDS);
+				exec.awaitTermination(15,TimeUnit.SECONDS);
 			}
 			
 		}
@@ -412,7 +412,7 @@ public class flight_info_db {//database class
 		}	
 		endTime = System.currentTimeMillis();
     	double final_time = (endTime - startTime)/1000.0;
-		Thread.sleep(5000);
+		Thread.sleep(6000);
     	System.out.println("Time Elapsed is: " + final_time);
         	
 	}
