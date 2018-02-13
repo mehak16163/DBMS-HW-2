@@ -10,12 +10,14 @@ class flight{//flight class
 	int lmode =-1; //-1 means no lock , 0 means shared lock , 1 means exclusive lock 
 	int id ;
 	int scount=0;
+	int capacity;
 	ReentrantLock lock = new ReentrantLock();//for exclusive locks
 	static int count=1;
 	ArrayList<passenger> pass = new ArrayList<passenger>();//passengers of that flight
-	public flight(){
+	public flight(int c){
 		id = count;
 		count++;
+		capacity = c;
 	}
 }
 
@@ -32,7 +34,7 @@ class passenger{//passenger class
 	}
 }
 
-abstract class Transaction implements Runnable{//transacction class which is abstract
+abstract class Transaction implements Runnable{//transaction class which is abstract
 	flight_info_db db;//database of the transaction
 	boolean mode;
 	public Transaction(flight_info_db _db , boolean m ){
@@ -52,6 +54,10 @@ class Reserve extends Transaction{//Transaction of type reserve
 	public void run() {
 		flight _f = db.fl[f];
 		passenger _p = db.pass[p];
+		if (_f.pass.contains(_p)){
+			System.out.println("Passenger "+p+" is already in flight "+f+".");
+			return;
+		}
 		if (mode){
 			int i=0;
 			while(_p.lmode!=-1 && _f.lmode!= -1 && i<=10000)//checking for shared locks if acquired.
@@ -62,18 +68,65 @@ class Reserve extends Transaction{//Transaction of type reserve
 			}
 			_p.lock.lock();
 			_f.lock.lock();
-			_p.lmode = 1;
-			_f.lmode = 1;
-			_p.fl.add(_f);
-			_f.pass.add(_p);
+			if (_f.pass.size()<_f.capacity){
+				System.out.println("Passenger "+p+" added to flight "+ f+".");
+				_p.lmode = 1;
+				_f.lmode = 1;
+				_p.fl.add(_f);
+				_f.pass.add(_p);
+			}
+			else{
+				System.out.println("Capacity of flight "+f+" is full. Passenger "+p+" could not be added.");
+			}
 			_p.lock.unlock();
 			_f.lock.unlock();
 			_p.lmode=-1; _f.lmode=-1;
 			//releasing the locks
 		}
 		else{
-			_p.fl.add(_f);
-			_f.pass.add(_p);
+			if (_f.pass.size()<_f.capacity){
+				_p.fl.add(_f);
+				_f.pass.add(_p);
+				System.out.println("Passenger "+p+" added to flight "+ f+".");
+			}
+			else{
+				System.out.println("Capacity of flight "+f+" is full. Passenger "+p+" could not be added.");
+			}
+		}
+	}
+	
+}
+
+class My_Flight extends Transaction{
+	int id;
+	public My_Flight(flight_info_db db , int _id, boolean mode){
+		super(db, mode);
+		id = _id;
+	}
+	
+	public void run() {
+		passenger _p = db.pass[id];// TODO Auto-generated method stub
+		if(mode){
+			int i=0;
+			while(_p.lmode==1 && i<10000){
+				i++;
+			}
+			if(i==10000){
+				System.out.println("Deadlock condition on Transaction My_Flight("+id+").");
+				return;
+			}
+			if(_p.lmode==-1 || _p.lmode==0){
+				_p.scount++;
+				_p.lmode=0;
+				for(int i=0;i<_p.fl.size();i++){
+					System.out.print(_p.fl.get(i)+" ");
+				}
+				//String fl="";
+				
+			}
+		}
+		else{
+			
 		}
 	}
 	
@@ -90,7 +143,6 @@ class Cancel extends Transaction
 		p = _p;
 	}
 	private Object lock = new Object();
-	@Override
 	public void run() 
 	{
 		flight _f = db.fl[f];
@@ -128,11 +180,13 @@ public class flight_info_db {//database class
 		int passengers = Integer.parseInt(rd.readLine());
 		pass = new passenger[passengers+1];
 		fl = new flight[flights+1];
-		for (int i=0;i<=passengers; i++){
+		System.out.println("Enter flight capacities:");
+		String[] cap = rd.readLine().split(" ");
+		for (int i=1;i<=passengers; i++){
 			pass[i] = new passenger();
 		}
-		for (int i=0;i<=flights;i++){
-			fl[i]= new flight();
+		for (int i=1;i<=flights;i++){
+			fl[i]= new flight(Integer.parseInt(cap[i-1]));
 		}
 		System.out.println("Enter Mode of execution:\n1. Serially\n2. Concurrently");
 		int m = Integer.parseInt(rd.readLine());
