@@ -1,3 +1,8 @@
+/*
+ * Name 1: SHRAVIKA MITTAL (2016093)
+ * NAME 2: MEHAK GUPTA (2016163)
+ * DBMS ASSIGNMENT 2
+ */
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,14 +13,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-class flight{//flight class
+class flight{ //flight class
+	
 	int lmode =-1; //-1 means no lock , 0 means shared lock , 1 means exclusive lock 
 	int id ;
 	int scount=0;
 	int capacity;
-	ReentrantLock lock = new ReentrantLock();//for exclusive locks
+	ReentrantLock lock = new ReentrantLock(); //for exclusive locks
 	static int count=1;
-	ArrayList<passenger> pass = new ArrayList<passenger>();//passengers of that flight
+	ArrayList<passenger> pass = new ArrayList<passenger>(); //passengers of that flight
 	public flight(int c){
 		id = count;
 		count++;
@@ -23,21 +29,21 @@ class flight{//flight class
 	}
 }
 
-class passenger{//passenger class
+class passenger{ //passenger class
 	int lmode = -1; //-1 means no lock, 0 means shared lock , 1 means exclusive lock 
 	ReentrantLock lock = new ReentrantLock();
 	int scount =0;
 	int id;
 	static int count=1;
-	ArrayList<flight> fl = new ArrayList<flight>();//flights of that passenger 
+	ArrayList<flight> fl = new ArrayList<flight>(); //flights of that passenger 
 	public passenger(){
 		id = count;
 		count++;
 	}
 }
 
-abstract class Transaction implements Runnable{//transaction class which is abstract
-	flight_info_db db;//database of the transaction
+abstract class Transaction implements Runnable{ //transaction class which is abstract
+	flight_info_db db; //database of the transaction
 	boolean mode;
 	public Transaction(flight_info_db _db , boolean m ){
 		db = _db;
@@ -45,10 +51,10 @@ abstract class Transaction implements Runnable{//transaction class which is abst
 	}
 }
 
-class Reserve extends Transaction{//Transaction of type reserve
+class Reserve extends Transaction{ //Transaction of type reserve
 	int f;
 	int p;
-	public Reserve(flight_info_db _db , int _f , int _p , boolean m){//constructor of the transaction
+	public Reserve(flight_info_db _db , int _f , int _p , boolean m){ //constructor of the transaction
 		super(_db,m);
 		f = _f;
 		p = _p;
@@ -67,7 +73,7 @@ class Reserve extends Transaction{//Transaction of type reserve
 		}
 		if (mode){
 			int i=0;
-			while(_p.lmode!=-1 && _f.lmode!= -1 && i<=10000)//checking for shared locks if acquired.
+			while(_p.lmode!=-1 && _f.lmode!= -1 && i<=10000) //checking for shared locks if acquired.
 				i++;
 			if (i==10001){
 				System.out.println("Deadlock on Reserve("+f+","+p+")");
@@ -245,7 +251,7 @@ class Cancel extends Transaction
 				_f.pass.remove(_p);
 				_p.lock.unlock();
 				_f.lock.unlock();
-				System.out.println("Flight "+f+" cancelled for passenger "+p+".");
+				System.out.println("Flight "+f+"cancelled for passenger "+p+".");
 				_p.lmode = -1;
 				_f.lmode = -1;
 			}
@@ -253,7 +259,7 @@ class Cancel extends Transaction
 			{
 				_p.fl.remove(_f);
 				_f.pass.remove(_p);
-				System.out.println("Flight "+f+" cancelled for passenger "+p+".");
+				System.out.println("Flight "+f+"cancelled for passenger "+p+".");
 			}
 		}
 		else
@@ -325,7 +331,7 @@ class Transfer extends Transaction
 			}
 		}
 		else if (!_f1.pass.contains(_p)){
-			System.out.println("No transfer since, No passenger "+p+" is not on flight "+f1+".");
+			System.out.println("No transfer since, No passenger "+p+" on flight "+f1+".");
 		}
 		else{
 			System.out.println("No transfer since, No capacity in flight "+f2+".");
@@ -333,14 +339,14 @@ class Transfer extends Transaction
 	}
 }
 
-public class flight_info_db {//database class
-	static passenger[] pass;//list of passengers
-	static flight[] fl;//list of flights
+public class flight_info_db { //database class
+	static passenger[] pass; //list of passengers
+	static flight[] fl; //list of flights
 	static int scount=0;
 	static int lmode =-1; //-1 for no lock , 0 for shared, 1 for exclusive. 
 	public static void main(String[] args) throws NumberFormatException, IOException, InterruptedException{
 		BufferedReader rd = new BufferedReader(new InputStreamReader(System.in));
-		System.out.println("Enter no. of flights: ");
+		System.out.println("Enter no. of flights: "); // taking user input
 		int  flights = Integer.parseInt(rd.readLine());
 		System.out.println("Enter no. of passengers: ");
 		int passengers = Integer.parseInt(rd.readLine());
@@ -366,10 +372,10 @@ public class flight_info_db {//database class
 		
 		for(int i=0;i<t;i++){
 			Random rint = new Random();
-			int tid = rint.nextInt(5)+1;
+			int tid = rint.nextInt(5)+1; // generating a random integer for selecting the transaction operation
 			if (tid==1){
 				int f = rint.nextInt(flights)+1;
-				int p = rint.nextInt(passengers)+1;
+				int p = rint.nextInt(passengers)+1; // passenger and flight id is generated randomly
 				tran[i] = new Reserve(db,f,p,mode);
 			}
 			else if (tid==2){
@@ -390,30 +396,29 @@ public class flight_info_db {//database class
 				int f2 = rint.nextInt(flights)+1;
 				tran[i] = new Transfer(db , f, f2 , p ,mode);
 			}
-		}long startTime; 
+		}
+		long startTime; 
     	long endTime; 
-   		startTime = System.currentTimeMillis();
+   		startTime = System.currentTimeMillis(); // start time of execution
 		if (mode){
-			ExecutorService exec = Executors.newFixedThreadPool(3);//creating threadpool for concurrency.
+			ExecutorService exec = Executors.newFixedThreadPool(5); //creating thread pool for concurrency.
 			for (int i=0;i<t;i++){
 				exec.execute(tran[i]);
 			}
 			if(!exec.isTerminated()){
 				exec.shutdown();
-				exec.awaitTermination(15,TimeUnit.SECONDS);
+				exec.awaitTermination(10,TimeUnit.SECONDS);
 			}
-			
 		}
-		else{
+		else{ // serial execution
 			for(int i=0;i<t;i++){
 				tran[i].run();
 			}
 			
 		}	
-		endTime = System.currentTimeMillis();
+		endTime = System.currentTimeMillis(); // end time of execution
     	double final_time = (endTime - startTime)/1000.0;
-		Thread.sleep(6000);
-    	System.out.println("Time Elapsed is: " + final_time);
-        	
+		Thread.sleep(5000);
+    	System.out.println("Time Elapsed is: " + final_time);       	
 	}
 }
