@@ -79,7 +79,41 @@ class Reserve extends Transaction{//Transaction of type reserve
 	
 }
 
-
+class Cancel extends Transaction
+{
+	int f;
+	int p;
+	public Cancel(flight_info_db _db , int _f , int _p , boolean m)
+	{
+		super(_db, m);
+		f = _f;
+		p = _p;
+	}
+	private Object lock = new Object();
+	@Override
+	public void run() 
+	{
+		flight _f = db.fl[f];
+		passenger _p = db.pass[p];
+		if(_f.pass.contains(_p) == true) // check if passenger had reserved that flight or not
+		{
+			if(mode)
+			{
+				_p.lock.lock();
+				_p.fl.remove(_f);
+				_f.lock.lock();
+				_f.pass.remove(_p);
+				_p.lock.unlock();
+				_f.lock.unlock();
+			}
+			else
+			{
+				_p.fl.remove(_f);
+				_f.pass.remove(_p);
+			}
+		}
+	}
+}
 
 public class flight_info_db {//database class
 	static passenger[] pass;//list of passengers
