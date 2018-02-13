@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
@@ -122,6 +123,7 @@ class My_Flight extends Transaction{
 				for(int j=0;j<_p.fl.size();j++){
 					System.out.print(_p.fl.get(j)+" ");
 				}
+				System.out.println();
 				_p.scount--;
 				if(_p.scount==0){
 					_p.lmode=-1;
@@ -133,6 +135,7 @@ class My_Flight extends Transaction{
 			for(int j=0;j<_p.fl.size();j++){
 				System.out.print(_p.fl.get(j)+" ");
 			}
+			System.out.println();
 		}
 	}
 	
@@ -282,9 +285,28 @@ public class flight_info_db {//database class
 		boolean mode=false;
 		if (m==2)
 			mode = true;
+		flight_info_db db = new flight_info_db();
 		System.out.println("Enter no. of transactions: ");
 		int t = Integer.parseInt(rd.readLine());
-		System.out.println("Menu:\n1. Reserve(F,i)\n2. Cancel(F,i)\n3.My_Flights(id)\n4.Total_Reservations()\n5.Transfer(F1,F2,i)\nPlease Enter transaction option and correct arguments.");
+		Transaction[] tran = new Transaction[t];
+		for(int i=0;i<t;i++){
+			Random rint = new Random();
+			int tid = rint.nextInt(5)+1;
+			if (tid==1){
+				int f = rint.nextInt(flights)+1;
+				int p = rint.nextInt(passengers)+1;
+				tran[i] = new Reserve(db,f,p,mode);
+			}
+			else if (tid==2){
+				int f = rint.nextInt(flights)+1;
+				int p = rint.nextInt(passengers)+1;
+				tran[i] = new Cancel(db,f,p,mode);
+			}
+			else if (tid==3){
+				int p = rint.nextInt(passengers)+1;
+				tran[i] = new My_Flight(db , p , mode);
+			}
+		}
 		ExecutorService exec = Executors.newFixedThreadPool(5);//creating threadpool for concurrency.
 		for (int i=0;i<t;i++){
 			
