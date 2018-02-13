@@ -137,10 +137,17 @@ class My_Flight extends Transaction{
 				_p.scount++;
 				_p.lmode=0;
 				System.out.println("The flights for passenger "+id+" are:");
-				for(int j=0;j<_p.fl.size();j++){
-					System.out.print(_p.fl.get(j).id+" ");
+				if(_p.fl.size() == 0)
+				{
+					System.out.println("No flight");
 				}
-				System.out.println();
+				else
+				{
+					for(int j=0;j<_p.fl.size();j++){
+						System.out.print(_p.fl.get(j).id+" ");
+					}
+					System.out.println();
+				}
 				_p.scount--;
 				if(_p.scount==0){
 					_p.lmode=-1;
@@ -149,10 +156,17 @@ class My_Flight extends Transaction{
 		}
 		else{
 			System.out.println("The flights for passenger "+id+" are:");
-			for(int j=0;j<_p.fl.size();j++){
-				System.out.print(_p.fl.get(j).id+" ");
+			if(_p.fl.size() == 0)
+			{
+				System.out.println("No flight");
 			}
-			System.out.println();
+			else
+			{
+				for(int j=0;j<_p.fl.size();j++){
+					System.out.print(_p.fl.get(j).id+" ");
+				}
+				System.out.println();
+			}
 		}
 	}
 	
