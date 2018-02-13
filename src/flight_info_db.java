@@ -141,6 +141,49 @@ class My_Flight extends Transaction{
 	
 }
 
+class Total_Reservations extends Transaction
+{
+	public Total_Reservations(flight_info_db db, boolean m)
+	{
+		super(db, m);
+	}
+
+	@Override
+	public void run() 
+	{
+		int sum = 0;
+		if(mode)
+		{
+			for(int i = 0 ; i<db.fl.length ; i++)
+			{
+				flight f = db.fl[i];
+				int j = 0;
+				while(f.lmode == 1 && j<10000)
+				{
+					i++;
+				}
+				if(j == 10000)
+				{
+					System.out.println("Deadlock condition on Total_Reservations().");
+					return;
+				}
+				if(f.lmode==-1 || f.lmode==0)
+				{
+					f.scount++;
+					f.lmode=0;
+					sum = sum + f.pass.size();
+					f.scount--;
+					if(f.scount == 0)
+					{
+						f.lmode = -1;
+					}
+				}
+			}
+		}
+		System.out.println("Total Reservations made on all filghts are: " + sum);
+	}
+}
+
 class Cancel extends Transaction
 {
 	int f;
