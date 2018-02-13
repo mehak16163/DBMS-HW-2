@@ -180,6 +180,10 @@ class Cancel extends Transaction
 				_f.capacity = _f.capacity + 1;
 			}
 		}
+		else
+		{
+			System.out.println("Passenger " + _p + "did not reserve Flight " + _f);
+		}
 	}
 }
 
