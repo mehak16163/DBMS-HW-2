@@ -318,8 +318,16 @@ class Transfer extends Transaction
 					return;
 				}
 				_p.lock.lock();
-				_f1.lock.lock();
-				_f2.lock.lock();
+				if(_f1.id<_f2.id) // for avoiding deadlocks
+				{
+					_f1.lock.lock();
+					_f2.lock.lock();
+				}
+				else
+				{
+					_f2.lock.lock();
+					_f1.lock.lock();
+				}
 				_p.lmode = 1;
 				_f1.lmode = 1;
 				_f2.lmode = 1;
@@ -328,8 +336,16 @@ class Transfer extends Transaction
 				_f1.pass.remove(_p);
 				_f2.pass.add(_p);
 				_p.lock.unlock();
-				_f1.lock.unlock();
-				_f2.lock.unlock();
+				if(_f1.id<_f2.id)
+				{
+					_f1.lock.unlock();
+					_f2.lock.unlock();
+				}
+				else
+				{
+					_f2.lock.unlock();
+					_f1.lock.unlock();
+				}
 				_p.lmode = -1;
 				_f1.lmode = -1;
 				_f2.lmode = -1;
