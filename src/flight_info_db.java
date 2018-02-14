@@ -61,7 +61,7 @@ class Reserve extends Transaction{ //Transaction of type reserve
 	}
 	public void run() {
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(10);
 		} catch (InterruptedException e) {
 			
 		}
@@ -119,7 +119,7 @@ class My_Flight extends Transaction{
 	
 	public void run() {
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(1);
 		} catch (InterruptedException e) {
 			
 		}
@@ -182,7 +182,7 @@ class Total_Reservations extends Transaction
 	public void run() 
 	{
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(1);
 		} catch (InterruptedException e) {
 			
 		}
@@ -238,7 +238,7 @@ class Cancel extends Transaction
 	public void run() 
 	{
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(1);
 		} catch (InterruptedException e) {
 			
 		}
@@ -297,7 +297,7 @@ class Transfer extends Transaction
 	}
 	public void run() {
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(1);
 		} catch (InterruptedException e) {
 			
 		}
@@ -387,21 +387,21 @@ public class flight_info_db { //database class
 		for(int i=0;i<t;i++){
 			Random rint = new Random();
 			int tid = rint.nextInt(100)+1; // generating a random integer for selecting the transaction operation
-			if (tid>=0 && tid<=60){
+			if (tid>=0 && tid<=20){
 				int f = rint.nextInt(flights)+1;
 				int p = rint.nextInt(passengers)+1; // passenger and flight id is generated randomly
 				tran[i] = new Reserve(db,f,p,mode);
 			}
-			else if (tid>=61 && tid<=70){
+			else if (tid>=21 && tid<=40){
 				int f = rint.nextInt(flights)+1;
 				int p = rint.nextInt(passengers)+1;
 				tran[i] = new Cancel(db,f,p,mode);
 			}
-			else if (tid>=71 && tid<=80){
+			else if (tid>=41 && tid<=60){
 				int p = rint.nextInt(passengers)+1;
 				tran[i] = new My_Flight(db , p , mode);
 			}
-			else if (tid>=81 && tid<=90){
+			else if (tid>=61 && tid<=80){
 				tran[i] = new Total_Reservations(db , mode);
 			}
 			else{
