@@ -386,22 +386,22 @@ public class flight_info_db { //database class
 		
 		for(int i=0;i<t;i++){
 			Random rint = new Random();
-			int tid = rint.nextInt(5)+1; // generating a random integer for selecting the transaction operation
-			if (tid==1){
+			int tid = rint.nextInt(100)+1; // generating a random integer for selecting the transaction operation
+			if (tid>=0 && tid<=60){
 				int f = rint.nextInt(flights)+1;
 				int p = rint.nextInt(passengers)+1; // passenger and flight id is generated randomly
 				tran[i] = new Reserve(db,f,p,mode);
 			}
-			else if (tid==2){
+			else if (tid>=61 && tid<=70){
 				int f = rint.nextInt(flights)+1;
 				int p = rint.nextInt(passengers)+1;
 				tran[i] = new Cancel(db,f,p,mode);
 			}
-			else if (tid==3){
+			else if (tid>=71 && tid<=80){
 				int p = rint.nextInt(passengers)+1;
 				tran[i] = new My_Flight(db , p , mode);
 			}
-			else if (tid==4){
+			else if (tid>=81 && tid<=90){
 				tran[i] = new Total_Reservations(db , mode);
 			}
 			else{
@@ -428,7 +428,6 @@ public class flight_info_db { //database class
 			for(int i=0;i<t;i++){
 				tran[i].run();
 			}
-			
 		}	
 		endTime = System.currentTimeMillis(); // end time of execution
     	double final_time = (endTime - startTime)/1000.0;
